@@ -2,24 +2,18 @@ import React from 'react';
 import logo from './logo.svg';
 import './App.css';
 
+import { Fabric, Button, Dialog, IStackTokens, DialogFooter, ButtonType } from 'office-ui-fabric-react';
+import PandemicStatsComponent from './components/Dashborad';
+
+
 function App() {
+
+  const stackTokens: IStackTokens = { childrenGap: 40 };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Fabric className="App">
+      <PandemicStatsComponent />
+    </Fabric>
   );
 }
 
