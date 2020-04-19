@@ -33,7 +33,7 @@ function CountrySelect() {
         fetch("https://covid19.mathdro.id/api/countries")
             .then(res => res.json())
             .then(obj => setCountries(parseApiResponse(obj)))
-    }, [selectedCountry, countries])
+    }, [selectedCountry])
 
     const dropdownValues = countries.map((c: any) => ({
         key: c.iso3Name,
@@ -81,7 +81,7 @@ function CountryDetail(props: any) {
             const detail: any = parseCountryDetailResponse(obj);
             setCountryDetail(detail)
         })
-    }, props.country)
+    }, [props.country])
 
 
     return (
