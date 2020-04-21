@@ -1,49 +1,30 @@
 import React, { useEffect, useState } from "react";
 
-import { Image, Dropdown } from "office-ui-fabric-react";
+import { Card } from "semantic-ui-react";
+
 import CountrySelect from "./ContrySelect";
+import { PandemicStats } from "../models/models";
+import { PandemicApi } from "../apis/pandemicApi";
 
-
-export interface PandemicStats {
-    confirmed: number;
-    recoverd: number;
-    deaths: number;
-    image?: string;
-}
-
-
-function parseApiResponse(response: any): PandemicStats {
-    return {
-        confirmed: response.confirmed.value,
-        recoverd: response.recovered.value,
-        deaths: response.deaths.value,
-        image: response.image
-    };
-}
-
-
-const Card = (props: any) => (
-    <div className="card">
-        <div className="card-body">
-            <h5 className="card-title">{props.header}</h5>
-            <p className="card-text">{props.value}</p>
-        </div>
-    </div>
+const StatsCard = (props: any) => (
+    <Card>
+        <Card.Content>
+            <Card.Header>{props.header}</Card.Header>
+            <Card.Description>{props.value}</Card.Description>
+        </Card.Content>
+    </Card>
 );
-
 
 function PandemicStatsComponent() {
 
     const initialState: Partial<PandemicStats> = {};
     const [stats, setStats] = useState(initialState)
 
-
     useEffect(() => {
-        fetch("https://covid19.mathdro.id/api")
-            .then(res => res.json())
-            .then(obj => setStats(parseApiResponse(obj)))
+        const api = new PandemicApi();
+        api.getPandemicStats()
+            .then(pandemicStats => setStats(pandemicStats))
     }, [])
-
 
     return (
         <>
@@ -58,17 +39,16 @@ function PandemicStatsComponent() {
                 </div>
                 <div className="row">
                     <div className="col-sm-4">
-                        <Card header="Confirmed" value={stats.confirmed} />
+                        <StatsCard header="Confirmed" value={stats.confirmed} />
                     </div>
                     <div className="col-sm-4">
-                        <Card header="Recovered" value={stats.recoverd} />
+                        <StatsCard header="Recovered" value={stats.recoverd} />
                     </div>
                     <div className="col-sm-4">
-                        <Card header="Deaths" value={stats.deaths} />
+                        <StatsCard header="Deaths" value={stats.deaths} />
                     </div>
                 </div>
             </div>
-
 
             <div className="container">
                 <CountrySelect />

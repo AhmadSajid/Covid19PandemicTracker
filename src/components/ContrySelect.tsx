@@ -1,27 +1,10 @@
 import React, { useEffect, useState } from "react";
 
-import { Image, Dropdown } from "office-ui-fabric-react";
-import { PandemicStats } from "./Dashborad";
+import { Dropdown, Grid } from "semantic-ui-react";
 
-interface Country {
-    name: string;
-    iso3Name: string;
-}
-
-function parseCountryDetailResponse(response: any): PandemicStats {
-    return {
-        confirmed: response.confirmed.value,
-        recoverd: response.recovered.value,
-        deaths: response.deaths.value,
-        image: response.image
-    };
-}
-
-
-function parseApiResponse(response: any): Country[] {
-    return response.countries
-        .map((c: any) => ({ name: c.name, iso3Name: c.iso3 }));
-}
+import CountryDetail from "./CountryDetail";
+import { PandemicApi } from "../apis/pandemicApi";
+import { Country } from "../models/models";
 
 function CountrySelect() {
 
@@ -29,73 +12,47 @@ function CountrySelect() {
     const [countries, setCountries] = useState(initialState);
     const [selectedCountry, setSelectedCountry] = useState();
 
+
     useEffect(() => {
-        fetch("https://covid19.mathdro.id/api/countries")
-            .then(res => res.json())
-            .then(obj => setCountries(parseApiResponse(obj)))
+        const api = new PandemicApi();
+        api.getCountries()
+        .then(cs => setCountries(cs))
+        .catch(err => console.log(err));
     }, [selectedCountry])
 
     const dropdownValues = countries.map((c: any) => ({
         key: c.iso3Name,
-        text: c.name
+        text: c.name,
+        value: c.name
     }));
 
-
-    const onChange = (e: any, options: any, index: any) => {
+    const onChange = (e: any, data: any) => {
         setSelectedCountry(e.target.textContent)
     }
 
-
     return (
-        <>
-            <div className="row">
-                <Dropdown
-                    placeholder="Select a country"
-                    label="Select infected country:"
-                    options={dropdownValues}
-                    onChange={onChange}
-                />
+        <Grid>
+            <Grid.Row>
+                <Grid.Column width={8}>
+                    <Dropdown
+                        fluid
+                        placeholder="Select a country"
+                        search
+                        selection
+                        options={dropdownValues}
+                        onChange={onChange}
+                    />
+                </Grid.Column>
 
-
-            </div>
-            {selectedCountry &&
-                <div className="row">
-                    <CountryDetail country={selectedCountry} />
-                </div>
-            }
-        </>
+                <Grid.Column width={8}>
+                    {selectedCountry &&
+                        <CountryDetail country={selectedCountry} />
+                    }
+                </Grid.Column>
+            </Grid.Row>
+        </Grid>
 
     );
-}
-
-
-function CountryDetail(props: any) {
-
-    const intitialState: Partial<PandemicStats> = {};
-    const [countryDetail, setCountryDetail] = useState(intitialState);
-
-    useEffect(() => {
-        fetch(`https://covid19.mathdro.id/api/countries/${props.country}`)
-        .then(res => res.json())
-        .then(obj => {
-            const detail: any = parseCountryDetailResponse(obj);
-            setCountryDetail(detail)
-        })
-    }, [props.country])
-
-
-    return (
-        <div className="card">
-            <div className="card-body">
-                <h5 className="card-title">Recovered</h5>
-                <p className="card-text">{countryDetail.recoverd}</p>
-                <h5 className="card-title">Deaths</h5>
-                <p className="card-text">{countryDetail.deaths}</p>
-                <h5 className="card-title">Confirmed</h5>
-                <p className="card-text">{countryDetail.confirmed}</p>
-            </div>
-        </div>
-    )
 }
 
 export default CountrySelect;
