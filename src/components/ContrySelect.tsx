@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import { Dropdown, Grid } from "semantic-ui-react";
+import { Dropdown, Grid, DropdownProps } from "semantic-ui-react";
 
 import CountryDetail from "./CountryDetail";
 import { PandemicApi } from "../apis/pandemicApi";
@@ -8,17 +8,14 @@ import { Country } from "../models/models";
 
 function CountrySelect() {
 
-    const initialState: Country[] = [];
-    const [countries, setCountries] = useState(initialState);
-    const [selectedCountry, setSelectedCountry] = useState();
-
+    const [countries, setCountries] = useState<Country[]>([]);
+    const [selectedCountry, setSelectedCountry] = useState<string>();
 
     useEffect(() => {
-        const api = new PandemicApi();
-        api.getCountries()
-        .then(cs => setCountries(cs))
-        .catch(err => console.log(err));
-    }, [selectedCountry])
+        PandemicApi
+            .getCountries()
+            .then(cs => setCountries(cs));
+    }, [])
 
     const dropdownValues = countries.map((c: any) => ({
         key: c.iso3Name,
@@ -26,8 +23,8 @@ function CountrySelect() {
         value: c.name
     }));
 
-    const onChange = (e: any, data: any) => {
-        setSelectedCountry(e.target.textContent)
+    const onChange = (e: any, data: DropdownProps) => {
+        setSelectedCountry(data.value?.toString());
     }
 
     return (

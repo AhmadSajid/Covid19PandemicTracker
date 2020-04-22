@@ -1,23 +1,8 @@
-// import { Country, PandemicStats } from "../models/models";
+import { Country, PandemicStats } from "../models/models";
 
-
-interface Country {
-    name: string;
-    iso3Name: string;
-}
-
-interface PandemicStats {
-    confirmed: number;
-    recoverd: number;
-    deaths: number;
-    image?: string;
-}
-
-class PandemicApi {
+class PandemicsApi {
 
     private baseApi = "https://covid19.mathdro.id/api";
-    private countriesApi = `${this.baseApi}/countries`;
-    private countryDetailApi = `${this.countriesApi}/`;
 
     public async getPandemicStats() {
         const json = await this.getResponse(this.baseApi);
@@ -26,19 +11,20 @@ class PandemicApi {
     }
 
     public async getCountries() {
-        const json = await this.getResponse(this.countriesApi);
+        const json = await this.getResponse(`${this.baseApi}/countries`);
         const countries = this.parseCountriesResponse(json);
         return countries;
     }
 
     public async getCountryDetail(country: string) {
         try {
-            const json = await this.getResponse(`${this.countryDetailApi}${country}`);
+            const json = await this.getResponse(`${this.baseApi}/countries/${country}`);
             const pandemicStatistics = this.parseStatistics(json);
             return pandemicStatistics;
         }
-        catch {
-            console.log("error");
+        catch(ex) {
+            console.log(ex);
+            alert(ex.error.message)
             return {};
         }
     }
@@ -60,8 +46,12 @@ class PandemicApi {
     private async getResponse(api: string) {
         const response = await fetch(api);
         const json = await response.json();
+
+        if(!response.ok) throw json;
+
         return json;
     }
 }
 
+const PandemicApi = new PandemicsApi();
 export { PandemicApi };
